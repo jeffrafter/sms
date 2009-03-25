@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.date = %q{2009-03-25}
   s.description = %q{TODO}
   s.email = %q{jeff@baobabhealth.org}
-  s.files = ["VERSION.yml", "lib/win32_sms.rb", "test/test_helper.rb", "test/win32_sms_test.rb"]
+  s.files = ["VERSION.yml", "lib/win32", "lib/win32/sms.rb", "test/test_helper.rb", "test/win32_sms_test.rb"]
   s.homepage = %q{http://github.com/jeffrafter/win32-sms}
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.1}

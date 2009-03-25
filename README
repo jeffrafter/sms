@@ -1,9 +1,24 @@
 win32-sms
 =========
 
-Description goes here.
+SMS interface for GSM modems (cell-phones plugged into your computer) that 
+uses the Win32 API for serial communications so that it does not need to
+be compiled and does not rely on additional gems.
+
+SAMPLE
+======
+Here are the basics. Note, when you call process it will call 
+fetch_and_delete_stored_messages which will fetch all of the messages off of 
+your main mailbox and delete them. Permanently.  
+  
+  require 'win32/sms'
+  modem = Win32::Sms.new("COM5")
+  modem.sms "+19519020972", "Hi Jeff, I am testing your gem"
+  messages = modem.process
 
 COPYRIGHT
 =========
 
-Copyright (c) 2008 Jeff Rafter. See LICENSE for details.
+Copyright (c) 2009 Jeff Rafter. See LICENSE for details.
+
+Based heavily on Adam McKaig's RubyGSM

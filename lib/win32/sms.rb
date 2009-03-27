@@ -61,8 +61,8 @@ module Win32
       @device = nil
     end
 
-    def command(data, term = "\r\n")
-      write(data + "\r\n")
+    def command(data, term = "\r")
+      write(data + "\r")
       response = wait(term)
       response.delete_if do |line|
         (line[0,6] == "+WIND:") or
@@ -104,7 +104,7 @@ module Win32
 
     def sms(number, text)
       # initiate the sms, and wait for either the text prompt or an error
-      command "AT+CMGS=\"#{number}\"", ["\r\n", "> "]
+      command "AT+CMGS=\"#{number}\"", ["\r", "> "]
       begin
         # send the sms, and wait until it is accepted or rejected
         text = encode(text)
@@ -145,7 +145,7 @@ module Win32
 
   protected
 
-    def wait(term = "\r\n")
+    def wait(term = "\r")
       response = []
       loop do
         buffer = read_until(term)

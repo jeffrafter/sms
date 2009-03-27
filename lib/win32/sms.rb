@@ -166,7 +166,7 @@ module Win32
         end
 
         # Check for 'OK' or prompt
-        if (buffer == "OK") or (buffer == ">") or (buffer =~ /^\+CPIN: (.+)$/
+        if (buffer == "OK") or (buffer == ">") or (buffer =~ /^\+CPIN: (.+)$/)
           return response
         end
       end

@@ -18,7 +18,7 @@ module Win32
 
   class Sms
 
-    attr_accessor :messages
+    attr_accessor :messages, :ignore_unknown_errors
 
     def initialize(port)
       @read_buffer = ""
@@ -103,18 +103,18 @@ module Win32
     end
 
     def sms(number, text)
-			# initiate the sms, and wait for either the text prompt or an error
-			command "AT+CMGS=\"#{number}\"", ["\r\n", "> "]
-  		begin
-				# send the sms, and wait until it is accepted or rejected
+      # initiate the sms, and wait for either the text prompt or an error
+      command "AT+CMGS=\"#{number}\"", ["\r\n", "> "]
+      begin
+        # send the sms, and wait until it is accepted or rejected
         text = encode(text)
-				write "#{text}#{26.chr}"
-				response = wait
+        write "#{text}#{26.chr}"
+        response = wait
       rescue
         # Escape entry mode
-				write 27.chr
-				raise
-			end
+        write 27.chr
+        raise
+      end
       response
     end
 
@@ -129,6 +129,19 @@ module Win32
       @messages = []
       fetch_and_delete_stored_messages
     end
+    
+    def pin?
+      not command("AT+CPIN?").include?("+CPIN: READY")
+    end    
+    
+    def pin=(pin)
+      return unless pin?
+      command "AT+CPIN=#{pin}"
+    end 
+    
+    def signal?
+      query("AT+CSQ")
+    end
 
   protected
 
@@ -142,6 +155,8 @@ module Win32
 
         # Check for formatted error
         if m = buffer.match(/^\+(CM[ES]) ERROR: (\d+)$/)
+          number = m.captures[1].to_i rescue 0
+          return response if number == 500 && @ignore_unknown_errors
           raise SmsError.new(buffer)
         end
 
@@ -151,7 +166,7 @@ module Win32
         end
 
         # Check for 'OK' or prompt
-        if (buffer == "OK") or (buffer == ">")
+        if (buffer == "OK") or (buffer == ">") or (buffer =~ /^\+CPIN: (.+)$/
           return response
         end
       end

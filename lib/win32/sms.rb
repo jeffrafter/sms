@@ -145,6 +145,17 @@ module Win32
 
   protected
 
+    def connect
+      # Echo off
+      command "ATE0" rescue nil
+      # Useful errors
+      command "AT+CMEE=1" rescue nil
+      # No notifications
+      command "AT+WIND=0" rescue nil
+      # Switch to text mode
+      command "AT+CMGF=1"
+    end
+
     def wait(term = "\r")
       response = []
       loop do
@@ -182,8 +193,8 @@ module Win32
     # returns the msg unchange
     def encode(msg)
       if (@encoding == :ascii)
-        # TODO, use lucky sneaks here
-        msg
+        require 'win32/lucky_sneaks/unidecoder'
+        msg = LuckySneaks::Unidecoder::decode(msg)
       elsif (@encoding == :utf8)
         # Unpacking and repacking supposedly cleans out bad (non-UTF-8) stuff
         utf8 = msg.unpack("U*");
@@ -307,17 +318,6 @@ module Win32
       count = count.unpack("L").first
       raise "Could not write data (#{get_last_error})" if hResult == 0
       # raise "Not enough bytes written" if count != data.size
-    end
-
-    def connect
-      # Echo off
-      command "ATE0" rescue nil
-      # Useful errors
-      command "AT+CMEE=1" rescue nil
-      # No notifications
-      command "AT+WIND=0" rescue nil
-      # Switch to text mode
-      command "AT+CMGF=1"
     end
   end
 end

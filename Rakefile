@@ -6,11 +6,11 @@ require 'rcov/rcovtask'
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |s|
-    s.name = "win32-sms"
-    s.summary = "TODO"
-    s.email = "jeff@baobabhealth.org"
-    s.homepage = "http://github.com/jeffrafter/win32-sms"
-    s.description = "TODO"
+    s.name = "sms"
+    s.summary = "Simple interface for SMS sending and receiving via AT commands using a connected GSM modem or phone"
+    s.email = "jeff@socialrange.org"
+    s.homepage = "http://github.com/jeffrafter/sms"
+    s.description = "Simple interface for SMS sending and receiving via AT commands using a connected GSM modem or phone"
     s.authors = ["Jeff Rafter"]
   end
 rescue LoadError
@@ -25,7 +25,7 @@ end
 
 Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_dir = 'rdoc'
-  rdoc.title    = 'win32-sms'
+  rdoc.title    = 'sms'
   rdoc.options << '--line-numbers' << '--inline-source'
   rdoc.rdoc_files.include('README*')
   rdoc.rdoc_files.include('lib/**/*.rb')

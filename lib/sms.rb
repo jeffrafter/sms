@@ -1,3 +1,4 @@
+require 'iconv'
 require 'serial/win32' if RUBY_PLATFORM.downcase.include?("mswin")
 require 'serial/generic' unless RUBY_PLATFORM.downcase.include?("mswin")
 
@@ -197,14 +198,15 @@ protected
   # Encodes the message using the set encoding or, if no encoding is specified
   # returns the msg unchange
   def encode(msg)
+    @encoding = @encoding.to_sym rescue nil
     if (@encoding == :ascii)
       require 'lucky_sneaks/unidecoder'
       msg = LuckySneaks::Unidecoder::decode(msg)
       msg
     elsif (@encoding == :utf8)
       # Unpacking and repacking supposedly cleans out bad (non-UTF-8) stuff
-      utf8 = msg.unpack("U*");
-      packed = utf8.pack("U*");
+      utf8 = msg.unpack("U*")
+      packed = utf8.pack("U*")
       packed
     elsif (@encoding == :ucs2)
       ucs2 = Iconv.iconv("UCS-2", "UTF-8", msg).first

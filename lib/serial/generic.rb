@@ -37,9 +37,7 @@ module Generic
 
     def write(data)
       begin
-        data.each_byte do |b|
-          @device.putc(b.chr)
-        end
+        @device.write(data)
       rescue Errno::EIO => e
         raise "Could not write data (IO: #{e.message})"
       rescue Exception => e

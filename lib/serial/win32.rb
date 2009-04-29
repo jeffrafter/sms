@@ -1,4 +1,5 @@
 require 'Win32API'
+require 'timeout'
 
 # http://www.rubyinside.com/cross-platform-ruby-serial-port-library-328.html
 
@@ -15,7 +16,6 @@ module Win32
   DCB_SIZE = 80
 
   class Serial
-
     def initialize(port)
       @read_buffer = ""
 
@@ -43,24 +43,32 @@ module Win32
     end
 
     def read
-      count = " "*4
-      buffer = " "*1024
-      hResult = @ReadFile.Call(@device, buffer, 1024, count, NULL)
-      raise "Could not read data (#{get_last_error})" if hResult == 0
-      count = count.unpack("L").first
-      @read_buffer << buffer[0..(count-1)]
-      hResult
+      Timeout::timeout(60) do
+        count = " "*4
+        buffer = " "*1024
+        hResult = @ReadFile.Call(@device, buffer, 1024, count, NULL)
+        raise "Could not read data (#{get_last_error})" if hResult == 0
+        count = count.unpack("L").first
+        @read_buffer << buffer[0..(count-1)]
+        hResult
+      rescue Timeout::Error
+        puts "Timed out reading"
+      end
     end
 
     def read_until(term)
-      term = [term].flatten
-      stop = nil
-      loop do
-        term.each {|t| stop = t and break if @read_buffer.index(t)}
-        break if stop
-        read
+      Timeout::timeout(60) do
+        term = [term].flatten
+        stop = nil
+        loop do
+          term.each {|t| stop = t and break if @read_buffer.index(t)}
+          break if stop
+          read
+        end
+        @read_buffer.slice!(0, @read_buffer.index(stop)+stop.size)
+      rescue Timeout::Error
+        puts "Timed out reading until '#{term}'"
       end
-      @read_buffer.slice!(0, @read_buffer.index(stop)+stop.size)
     end
 
     def write(data)
